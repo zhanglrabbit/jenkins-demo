@@ -14,13 +14,13 @@ node('haimaxy-jnlp') {
     }
     stage('Build') {
         echo "3.Build Docker Image Stage"
-        sh "docker build -t registry.cn-shanghai.aliyuncs.com/xiniao/k8s/jenkins-demo:${build_tag} ."
+        sh "docker build -t harbor.jiabiango.com/cnych/jenkins-demo:${build_tag} ."
     }
     stage('Push') {
         echo "4.Push Docker Image Stage"
-        withCredentials([usernamePassword(credentialsId: 'aliyunharbor', passwordVariable: 'aliyunharborPassword', usernameVariable: 'aliyunharborUser')]) {
-            sh "docker login registry.cn-shanghai.aliyuncs.com -u ${aliyunharborUser} -p ${aliyunharborPassword}"
-            sh "docker push registry.cn-shanghai.aliyuncs.com/xiniao/k8s/jenkins-demo:${build_tag}"
+        withCredentials([usernamePassword(credentialsId: 'harbor', passwordVariable: 'harborPassword', usernameVariable: 'harborUser')]) {
+            sh "docker login harbor.jiabiango.com -u ${harborUser} -p ${harborPassword}"
+            sh "docker push harbor.jiabiango.com/cnych/jenkins-demo:${build_tag}"
         }
     }
     stage('Deploy') {
