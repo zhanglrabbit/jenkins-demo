@@ -13,7 +13,6 @@ node('haimaxy-jnlp') {
         }
 	echo "${build_tag}"
 	echo "${env.BRANCH_NAME}"
-	echo "${BRANCH_NAME}"
     }
     stage('Test') {
       echo "2.Test Stage"
