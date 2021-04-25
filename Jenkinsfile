@@ -8,6 +8,9 @@ node('haimaxy-jnlp') {
                 build_tag = "${env.BRANCH_NAME}-${build_tag}"
             }
         }
+	echo "${build_tag}"
+	echo "${env.BRANCH_NAME}"
+	echo "${BRANCH_NAME}"
     }
     stage('Test') {
       echo "2.Test Stage"
@@ -30,6 +33,7 @@ node('haimaxy-jnlp') {
         }
         sh "sed -i 's/<BUILD_TAG>/${build_tag}/' k8s.yaml"
         sh "sed -i 's/<BRANCH_NAME>/${env.BRANCH_NAME}/' k8s.yaml"
+	sh "kubectl delete  deploy  jenkins-demo"
         sh "kubectl apply -f k8s.yaml --record"
     }
 }
