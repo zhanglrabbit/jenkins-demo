@@ -1,9 +1,6 @@
 node('haimaxy-jnlp') {
     stage('Prepare') {
         echo "1.Prepare Stage"
-   	environment { 
-            def http_proxy="http://8.210.101.255:8000"
-        }
         checkout scm
         script {
             build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
@@ -11,21 +8,19 @@ node('haimaxy-jnlp') {
                 build_tag = "${env.BRANCH_NAME}-${build_tag}"
             }
         }
-	echo "${build_tag}"
-	echo "${env.BRANCH_NAME}"
     }
     stage('Test') {
       echo "2.Test Stage"
     }
     stage('Build') {
         echo "3.Build Docker Image Stage"
-        sh "docker build -t registry.cn-shanghai.aliyuncs.com/xiniao/k8s/jenkins-demo:${build_tag} ."
+        sh "docker build -t harbor.jiabiango.com/cnych/jenkins-demo:${build_tag} ."
     }
     stage('Push') {
         echo "4.Push Docker Image Stage"
-        withCredentials([usernamePassword(credentialsId: 'aliyunharbor', passwordVariable: 'aliyunharborPassword', usernameVariable: 'aliyunharborUser')]) {
-            sh "docker login registry.cn-shanghai.aliyuncs.com -u ${aliyunharborUser} -p ${aliyunharborPassword}"
-            sh "docker push registry.cn-shanghai.aliyuncs.com/xiniao/k8s/jenkins-demo:${build_tag}"
+        withCredentials([usernamePassword(credentialsId: 'harbor', passwordVariable: 'harborPassword', usernameVariable: 'harborUser')]) {
+            sh "docker login harbor.jiabiango.com -u ${harborUser} -p ${harborPassword}"
+            sh "docker push harbor.jiabiango.com/cnych/jenkins-demo:${build_tag}"
         }
     }
     stage('Deploy') {
@@ -35,7 +30,6 @@ node('haimaxy-jnlp') {
         }
         sh "sed -i 's/<BUILD_TAG>/${build_tag}/' k8s.yaml"
         sh "sed -i 's/<BRANCH_NAME>/${env.BRANCH_NAME}/' k8s.yaml"
-	sh "kubectl delete  deploy  jenkins-demo"
         sh "kubectl apply -f k8s.yaml --record"
     }
 }
